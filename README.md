@@ -24,6 +24,7 @@ Infrastructure is deployed using **Helm Charts** for speed, reusability, and eas
 ---
 
 ## 🏗️ Architecture Diagram
+```
 [Developer/Team Lead (CLI User)]
              │
              ▼
@@ -41,7 +42,7 @@ Infrastructure is deployed using **Helm Charts** for speed, reusability, and eas
 [Kubernetes Cluster Resources Created]
  (Namespace ready for deployments!)
 
-
+```
 ---
 
 ## 🚀 How It Works (Flow)
@@ -55,7 +56,7 @@ Infrastructure is deployed using **Helm Charts** for speed, reusability, and eas
 ---
 
 ## 📂 Project Structure
-
+```
 k8s-infra-cli/
 ├── chart/
 │   ├── Chart.yaml
@@ -77,7 +78,7 @@ k8s-infra-cli/
 └── examples/
     └── sample_values.yaml
 
-
+```
 ---
 
 ## 📋 Example CLI Usage
