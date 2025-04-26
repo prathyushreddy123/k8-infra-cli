@@ -114,6 +114,8 @@ nodeAffinity:
   operator: "In"
   values: ["gpu-node"]
 
+```
+
 ## Future Enhancements
 
 GitOps Mode: Push values.yaml automatically to Git repository (ArgoCD watches and applies).
