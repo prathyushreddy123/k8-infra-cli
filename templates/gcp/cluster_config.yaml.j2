@@ -2,10 +2,58 @@ apiVersion: container.cnrm.cloud.google.com/v1beta1
 kind: ContainerCluster
 metadata:
   name: {{ cluster.name }}
+  labels:
+    environment: {{ account.environment }}
+    owner: {{ email.to }}
 spec:
   location: {{ account.region }}
   initialNodeCount: {{ nodeGroups[0].desired }}
+  releaseChannel:
+    channel: "REGULAR"
   nodeConfig:
     machineType: {{ nodeGroups[0].instanceType }}
     oauthScopes:
       - https://www.googleapis.com/auth/cloud-platform
+    labels:
+      {% for k, v in nodeGroups[0].labels.items() %}
+      {{ k }}: {{ v }}
+      {% endfor %}
+    {% if nodeGroups[0].taints %}
+    taints:
+      {% for taint in nodeGroups[0].taints %}
+      - key: {{ taint.key }}
+        value: {{ taint.value }}
+        effect: {{ taint.effect }}
+      {% endfor %}
+    {% endif %}
+  addonsConfig:
+    httpLoadBalancing:
+      disabled: {{ not addons.ingressNginx.enabled }}
+    horizontalPodAutoscaling:
+      disabled: false
+    {% if addons.prometheus.enabled or addons.grafana.enabled %}
+    gkeBackupAgentConfig:
+      enabled: true
+    {% endif %}
+
+  loggingConfig:
+    enableComponents:
+      - SYSTEM_COMPONENTS
+      {% if addons.prometheus.enabled %}- PROMETHEUS{% endif %}
+      {% if addons.grafana.enabled %}- GRAFANA{% endif %}
+
+  workloadIdentityConfig:
+    workloadPool: "{{ account.projectId }}.svc.id.goog"
+
+  {% if identityProvider.enabled %}
+  authenticatorGroupsConfig:
+    enabled: true
+  {% endif %}
+
+  notificationConfig:
+    pubsub:
+      enabled: true
+      topic: "gke-cluster-updates"
+  maintenancePolicy:
+    dailyMaintenanceWindow:
+      startTime: "{{ nodeUpdates.schedule }}"
