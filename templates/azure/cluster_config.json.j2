@@ -1,0 +1,82 @@
+{
+  "location": "{{ account.region }}",
+  "resourceGroup": "{{ account.resourceGroup | default('aks-rg') }}",
+  "name": "{{ cluster.name }}",
+  "kubernetesVersion": "{{ cluster.version }}",
+
+  "agentPoolProfiles": [
+    {% for node in nodeGroups %}
+    {
+      "name": "{{ node.name }}",
+      "count": {{ node.desired }},
+      "minCount": {{ node.min }},
+      "maxCount": {{ node.max }},
+      "vmSize": "{{ node.instanceType }}",
+      "enableAutoScaling": true,
+      "type": "VirtualMachineScaleSets",
+      "mode": "System",
+      "tags": {
+        {% for key, value in node.labels.items() %}
+        "{{ key }}": "{{ value }}"{% if not loop.last %},{% endif %}
+        {% endfor %}
+      },
+      {% if node.taints %}
+      "nodeTaints": [
+        {% for taint in node.taints %}
+        "{{ taint.key }}={{ taint.value }}:{{ taint.effect }}"{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ],
+      {% endif %}
+      "osDiskSizeGB": 30
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ],
+
+  "identity": {
+    "type": "SystemAssigned"
+  },
+
+  "addonProfiles": {
+    {% if addons.ingressNginx.enabled %}
+    "IngressNginx": { "enabled": true },
+    {% endif %}
+    {% if addons.prometheus.enabled %}
+    "Prometheus": { "enabled": true },
+    {% endif %}
+    {% if addons.grafana.enabled %}
+    "Grafana": { "enabled": true },
+    {% endif %}
+    {% if addons.flux.enabled %}
+    "Flux": { "enabled": true },
+    {% endif %}
+    {% if addons.certificateOperator.enabled %}
+    "CertManager": { "enabled": true },
+    {% endif %}
+    {% if addons.cilium.enabled %}
+    "Cilium": { "enabled": true },
+    {% endif %}
+    {% if addons.nodeProblemDetector.enabled %}
+    "NodeProblemDetector": { "enabled": true }
+    {% endif %}
+  },
+
+  "kubeletConfig": {
+    "shutdownGracePeriod": "{{ kubeletConfiguration.shutdownGracePeriod }}",
+    "shutdownGracePeriodCriticalPods": "{{ kubeletConfiguration.shutdownGracePeriodCriticalPods }}"
+  },
+
+  "autoUpgradeProfile": {
+    "upgradeChannel": "stable"
+  },
+
+  "nodeUpdateSchedule": {
+    "enabled": {{ nodeUpdates.enabled | lower }},
+    "schedule": "{{ nodeUpdates.schedule }}",
+    "drainTimeout": "{{ nodeUpdates.drainTimeout }}"
+  },
+
+  "tags": {
+    "owner": "{{ email.to }}",
+    "environment": "{{ account.environment }}"
+  }
+}

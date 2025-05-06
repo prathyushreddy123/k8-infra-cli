@@ -1,0 +1,11 @@
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerCluster
+metadata:
+  name: {{ cluster.name }}
+spec:
+  location: {{ account.region }}
+  initialNodeCount: {{ nodeGroups[0].desired }}
+  nodeConfig:
+    machineType: {{ nodeGroups[0].instanceType }}
+    oauthScopes:
+      - https://www.googleapis.com/auth/cloud-platform
