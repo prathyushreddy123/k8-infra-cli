@@ -1,0 +1,68 @@
+cloud: gcp
+account:
+  id: "123456789012"
+  region: "us-central1"
+  environment: "dev"
+  projectId: "my-gcp-project"
+cluster:
+  name: "analytics-dev"
+  version: "1.29"
+  chartVersion: "1.0"
+email:
+  to: "devops@company.com"
+nodeUpdates:
+  enabled: true
+  schedule: "0 11 * * 6"
+  partitionSize: 1
+  drainTimeout: "2m"
+kubeletConfiguration:
+  shutdownGracePeriod: "3m"
+  shutdownGracePeriodCriticalPods: "1m"
+nodeGroups:
+  - name: apps
+    instanceType: e2-medium
+    min: 3
+    max: 3
+    desired: 3
+    subnets: ["subnet-123", "subnet-456"]
+    labels:
+      node: apps
+    shutdownDelay:
+      enabled: true
+      delay: 360
+  - name: jobs
+    instanceType: n2-standard-4
+    min: 1
+    max: 6
+    desired: 1
+    subnets: ["subnet-789"]
+    labels:
+      node: jobs
+      dedicated: jobs
+    taints:
+      - key: dedicated
+        value: jobs
+        effect: NoSchedule
+    shutdownDelay:
+      enabled: true
+      delay: 360
+addons:
+  ingressNginx:
+    enabled: true
+  prometheus:
+    enabled: true
+  grafana:
+    enabled: true
+  flux:
+    enabled: true
+  cloudwatchLogs:
+    enabled: true
+    retentionInDays: 30
+  certificateOperator:
+    enabled: true
+  cilium:
+    enabled: true
+  nodeProblemDetector:
+    enabled: false
+identityProvider:
+  enabled: true

@@ -1,0 +1,165 @@
+type: object
+required:
+  - cloud
+  - account
+  - cluster
+  - nodeGroups
+  - addons
+properties:
+  cloud:
+    type: string
+    enum:
+      - aws
+      - azure
+      - gcp
+  account:
+    type: object
+    required:
+      - id
+      - region
+      - environment
+    properties:
+      id:
+        type: string
+      region:
+        type: string
+      environment:
+        type: string
+      resourceGroup:
+        type: string
+      projectId:
+        type: string
+  cluster:
+    type: object
+    required:
+      - name
+      - version
+      - chartVersion
+    properties:
+      name:
+        type: string
+      version:
+        type: string
+      chartVersion:
+        type: string
+  email:
+    type: object
+    required:
+      - to
+    properties:
+      to:
+        type: string
+        format: email
+  nodeUpdates:
+    type: object
+    properties:
+      enabled:
+        type: boolean
+      schedule:
+        type: string
+      partitionSize:
+        type: integer
+      drainTimeout:
+        type: string
+  kubeletConfiguration:
+    type: object
+    properties:
+      shutdownGracePeriod:
+        type: string
+      shutdownGracePeriodCriticalPods:
+        type: string
+  nodeGroups:
+    type: array
+    items:
+      type: object
+      required:
+        - name
+        - instanceType
+        - min
+        - max
+        - desired
+      properties:
+        name:
+          type: string
+        instanceType:
+          type: string
+        min:
+          type: integer
+        max:
+          type: integer
+        desired:
+          type: integer
+        subnets:
+          type: array
+          items:
+            type: string
+        labels:
+          type: object
+        taints:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+              value:
+                type: string
+              effect:
+                type: string
+        shutdownDelay:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+            delay:
+              type: integer
+  addons:
+    type: object
+    properties:
+      ingressNginx:
+        type: object
+        properties:
+          enabled:
+            type: boolean
+      prometheus:
+        type: object
+        properties:
+          enabled:
+            type: boolean
+      grafana:
+        type: object
+        properties:
+          enabled:
+            type: boolean
+      flux:
+        type: object
+        properties:
+          enabled:
+            type: boolean
+      cloudwatchLogs:
+        type: object
+        properties:
+          enabled:
+            type: boolean
+          retentionInDays:
+            type: integer
+      certificateOperator:
+        type: object
+        properties:
+          enabled:
+            type: boolean
+      cilium:
+        type: object
+        properties:
+          enabled:
+            type: boolean
+      nodeProblemDetector:
+        type: object
+        properties:
+          enabled:
+            type: boolean
+  identityProvider:
+    type: object
+    properties:
+      enabled:
+        type: boolean
