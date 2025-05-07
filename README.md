@@ -111,8 +111,8 @@ identityProvider:
 
 ## 📖 Docs
 
-- [Phase 1: Why I’m Building This CLI](https://your-hashnode-link.com/phase-1)
-- [Phase 2: Validated Config-Driven CLI Design](https://your-hashnode-link.com/phase-2)
+- [Phase 1: Why I’m Building This CLI](https://prathyushdommata.hashnode.dev/kubernetes-cli)
+- [Phase 2: Validated Config-Driven CLI Design](https://prathyushdommata.hashnode.dev/robust-kubernetes-cli)
 
 ---
 
