@@ -1,37 +1,27 @@
 import click
-import yaml
-import os
+from utils.validation import validate_config_file
 
 @click.command()
-@click.option(
-    "--config-file", "-f",
-    required=True,
-    type=click.Path(exists=True),
-    help="Path to your multi-cloud cluster config YAML file"
-)
+@click.option('--config-file', '-f', required=True, type=click.Path(exists=True), help='Path to your YAML config')
 def load(config_file):
-    """
-    Load a cluster config YAML file and prepare it for template rendering.
-    """
-    click.echo(f"Loading config from: {config_file}")
-
+    """Load and parse a cluster config YAML file."""
     try:
-        with open(config_file, "r") as file:
-            config = yaml.safe_load(file)
-            cloud = config.get("cloud", "undefined").lower()
+        # ✅ Validate and load full config using shared utility
+        config = validate_config_file(config_file)
 
-            if cloud not in ["aws", "azure", "gcp"]:
-                click.echo("ERROR: Unsupported or missing cloud type. Use aws/azure/gcp.")
-                return
+        cloud = config.get('cloud', 'unknown')
+        cluster_name = config.get('cluster', {}).get('name', 'undefined')
+        region = config.get('account', {}).get('region', 'undefined')
+        version = config.get('cluster', {}).get('version', 'unknown')
+        environment = config.get('account', {}).get('environment', 'dev')
 
-            account = config.get("account", {})
-            cluster = config.get("cluster", {})
-
-            click.echo(f"Cloud: {cloud}")
-            click.echo(f"Cluster: {cluster.get('name')} in {account.get('region')}")
-
-            # future step: pass to Jinja2 templating engine
-            click.echo("Config loaded successfully. Ready for rendering phase.")
+        click.echo("✅ Config Summary:")
+        click.echo(f"   ☁️  Cloud       : {cloud}")
+        click.echo(f"   🔧 Cluster Name: {cluster_name}")
+        click.echo(f"   🌍 Region      : {region}")
+        click.echo(f"   🧪 Version     : {version}")
+        click.echo(f"   🏷️  Environment : {environment}")
+        click.echo(f"   ✅ Validation passed successfully")
 
     except Exception as e:
-        click.echo(f"Failed to parse YAML file: {e}")
+        click.echo(f"❌ Failed to load config: {e}")
