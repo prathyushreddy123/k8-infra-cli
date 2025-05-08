@@ -1,39 +1,37 @@
-import click
+import yaml
 import os
-from jinja2 import Environment, FileSystemLoader, TemplateNotFound
-from utils.validation import validate_config_file
+from jsonschema import validate, ValidationError
 
-@click.command()
-@click.option('--config-file', '-f', required=True, type=click.Path(exists=True), help='Path to config YAML')
-def render(config_file):
-    """Render cloud-specific template using config and save to /output/."""
+def validate_config_file(config_path: str) -> dict:
+    """
+    Validates the given YAML config file against its corresponding cloud schema.
+    Returns the loaded and validated config dict.
+    Raises an exception on validation failure.
+    """
+    if not os.path.exists(config_path):
+        raise FileNotFoundError(f"Config file does not exist: {config_path}")
+
+    # Load user config
+    with open(config_path, 'r') as f:
+        config = yaml.safe_load(f)
+
+    cloud = config.get("cloud", "").lower()
+    if cloud not in ["aws", "azure", "gcp"]:
+        raise ValueError("Missing or unsupported 'cloud' in config. Must be one of: aws, azure, gcp.")
+
+    # Locate schema for the cloud provider
+    schema_path = os.path.join("configs", "schema", f"{cloud}-schema.yaml")
+    if not os.path.exists(schema_path):
+        raise FileNotFoundError(f"Schema file not found: {schema_path}")
+
+    # Load schema
+    with open(schema_path, 'r') as f:
+        schema = yaml.safe_load(f)
+
+    # Validate config against schema
     try:
-        # ✅ Step 1: Validate config and load it
-        config = validate_config_file(config_file)
+        validate(instance=config, schema=schema)
+    except ValidationError as e:
+        raise ValueError(f"Validation error in {config_path}: {e.message}")
 
-        cloud = config.get("cloud", "").lower()
-        cluster_name = config.get("cluster", {}).get("name", "default-cluster")
-        output_ext = "yaml" if cloud in ["aws", "gcp"] else "json"
-
-        # Step 2: Set up Jinja2 environment
-        template_dir = f"templates/{cloud}"
-        env = Environment(loader=FileSystemLoader(template_dir))
-
-        try:
-            template = env.get_template(f"cluster_config.{output_ext}.j2")
-        except TemplateNotFound:
-            click.echo(f"❌ Template not found for cloud: {cloud}")
-            return
-
-        # Step 3: Render and save
-        rendered_output = template.render(config)
-        os.makedirs("output", exist_ok=True)
-        output_file = f"output/{cluster_name}-cluster.{output_ext}"
-
-        with open(output_file, "w") as out:
-            out.write(rendered_output)
-
-        click.echo(f"✅ Rendered template saved to: {output_file}")
-
-    except Exception as e:
-        click.echo(f"❌ Render failed: {e}")
+    return config
