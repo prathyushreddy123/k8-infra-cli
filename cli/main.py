@@ -4,6 +4,7 @@ from cli.load_config import load
 from cli.render_templates import render
 from cli.apply_infra import apply
 from cli.validate_config import validate
+from infra_cli.utils.validation import validate_config_file
 
 @click.group()
 def cli():

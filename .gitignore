@@ -1,0 +1,16 @@
+#Ignore python virtual envs
+prat/
+.prat/
+infra_cli.egg-info/
+
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+
+# Output & log files
+output/
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
