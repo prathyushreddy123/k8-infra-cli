@@ -30,3 +30,10 @@ aws-credentials.json
 # Environment variables
 .env
 .env.*
+
+# Large files and archives
+*.zip
+*.tar.gz
+*.tgz
+eksctl
+awscliv2
