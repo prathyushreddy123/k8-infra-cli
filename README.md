@@ -292,7 +292,7 @@ $env:DEBUG=1    # Windows
 
 - [x] Basic CLI structure and commands
 - [x] AWS (eksctl) integration
-- [ ] Azure AKS full integration
+- [x] Azure AKS full integration
 - [ ] GCP GKE integration
 - [ ] Terraform backend support
 - [ ] GitOps integration with Flux
