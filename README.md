@@ -2,6 +2,19 @@
 
 This CLI tool allows platform and DevOps teams to self-serve Kubernetes infrastructure across AWS, Azure, and GCP by submitting YAML-based configuration files. The CLI handles validation, templating, and infrastructure provisioning — all via simple commands.
 
+## 🏗️ Architecture
+
+![Architecture Diagram](./image1.png)
+
+The architecture diagram above illustrates the workflow:
+1. User provides a YAML configuration
+2. CLI validates the configuration against cloud-specific schemas
+3. Cloud provider is automatically detected
+4. Appropriate cloud templates are generated (eksctl/az/gcloud)
+5. Templates are rendered to the output directory
+6. Changes can be previewed (dry-run) or applied
+7. Final deployment to chosen cloud provider (AWS EKS, Azure AKS, or GCP GKE)
+
 ---
 
 ## 📋 Prerequisites
