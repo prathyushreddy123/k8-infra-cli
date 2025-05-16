@@ -14,3 +14,19 @@ output/
 # OS-specific
 .DS_Store
 Thumbs.db
+
+# Virtual Environment
+.venv/
+venv/
+
+# AWS credentials and config
+.aws/
+aws-credentials.json
+
+# IDE settings
+.vscode/
+.idea/
+
+# Environment variables
+.env
+.env.*

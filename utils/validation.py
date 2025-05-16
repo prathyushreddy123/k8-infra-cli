@@ -20,7 +20,7 @@ def validate_config_file(config_path: str) -> dict:
         raise ValueError("Missing or unsupported 'cloud' in config. Must be one of: aws, azure, gcp.")
 
     # Locate schema for the cloud provider
-    schema_path = os.path.join("configs", "schema", f"{cloud}-schema.yaml")
+    schema_path = os.path.join("config", "schema", f"{cloud}-schema.yaml")
     if not os.path.exists(schema_path):
         raise FileNotFoundError(f"Schema file not found: {schema_path}")
 

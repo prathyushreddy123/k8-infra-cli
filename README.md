@@ -4,14 +4,75 @@ This CLI tool allows platform and DevOps teams to self-serve Kubernetes infrastr
 
 ---
 
+## 📋 Prerequisites
+
+- Python 3.8 or higher
+- PowerShell (Windows) or Bash (Linux/macOS)
+- Cloud Provider CLI tools:
+  - AWS: `eksctl` and AWS CLI v2
+  - Azure: Azure CLI (`az`)
+  - GCP: Google Cloud SDK (`gcloud`)
+- Valid cloud provider credentials configured
+
+---
+
+## ⚙️ Installation & Setup
+
+### Windows (PowerShell)
+
+```powershell
+# Clone the repository
+git clone <repository-url>
+cd infra-cli
+
+# Create and activate virtual environment
+python -m venv .venv
+.\.venv\Scripts\Activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the setup script
+.\setup.ps1
+```
+
+### Linux/macOS
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd infra-cli
+
+# Create and activate virtual environment
+python -m venv .venv
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Install cloud provider CLIs
+# AWS
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/eksctl /usr/local/bin
+
+# Azure
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+# GCP
+# Follow instructions at https://cloud.google.com/sdk/docs/install
+```
+
+---
+
 ## 🚀 Features
 
 - ✅ Schema validation of infrastructure configs
 - 🧱 Modular CLI with commands for load, validate, render, and apply
 - 🌍 Multi-cloud support: AWS, Azure, GCP
 - 🧰 Jinja2 templating for cloud-native config generation
-- 🛠️ Extensible backend (eksctl, az, gcloud, Terraform-ready)
+- 🛠️ Native cloud provider CLI integration (eksctl, az, gcloud)
 - 🧪 CI/CD-friendly `validate` command
+- 🔄 Dry-run support for safe testing
 - 🧩 Default config merging (optional)
 
 ---
@@ -19,68 +80,75 @@ This CLI tool allows platform and DevOps teams to self-serve Kubernetes infrastr
 ## 🗂️ Project Structure
 
 ```bash
-multi-cloud-infra-cli/
-├── cli/                    # CLI command files
-│   ├── apply_infra.py
-│   ├── load_config.py
-│   ├── render_templates.py
-│   └── validate_config.py
-├── utils/                  # Shared logic
-│   └── validation.py
-├── configs/
-│   ├── schema/             # JSONSchema files per cloud
-│   └── defaults/           # Optional default values
-├── examples/               # Sample team configurations
-│   ├── aws-sample.yaml
-├── templates/              # Jinja templates per cloud
+infra-cli/
+├── cli/                    # CLI command implementations
+│   ├── main.py            # Main CLI entry point
+│   ├── apply_infra.py     # Infrastructure provisioning
+│   ├── load_config.py     # Config loading and validation
+│   ├── render_templates.py # Template rendering
+│   └── validate_config.py # Schema validation
+├── utils/                  # Shared utilities
+├── config/                 # Configuration files
+│   ├── schema/            # JSONSchema files per cloud
+│   └── defaults/          # Default configurations
+├── templates/             # Cloud-specific Jinja templates
 │   ├── aws/
 │   ├── azure/
 │   └── gcp/
-└── output/                 # Rendered templates
+├── tests/                 # Test suite
+│   ├── test_validation.py
+│   ├── test_render.py
+│   └── test_apply.py
+└── output/               # Generated configuration files
 ```
 
 ---
 
 ## 🧪 CLI Commands
 
-### `validate`
+### `validate-config`
 ```bash
-infra-cli validate --config-file examples/aws-sample.yaml
+infra-cli validate-config --config-file path/to/config.yaml --schema-file path/to/schema.yaml
 ```
-- ✅ Validates config against schema
-- Useful for CI/CD or early feedback
-
----
+- ✅ Validates configuration against cloud-specific schema
+- Returns detailed validation errors if any
+- Useful for CI/CD pipelines
 
 ### `load`
 ```bash
-infra-cli load --config-file examples/aws-sample.yaml
+infra-cli load --config-file path/to/config.yaml
 ```
-- 🔍 Validates and prints cloud, region, version, environment
-- Great for debugging and confirming inputs
-
----
+- 🔍 Loads and validates configuration
+- Displays cluster details (cloud, region, version, environment)
+- Helpful for configuration verification
 
 ### `render`
 ```bash
-infra-cli render --config-file examples/aws-sample.yaml
+infra-cli render --config-file path/to/config.yaml
 ```
-- 📄 Renders cloud-native infra templates from YAML
-- Outputs to `/output/` directory
-- Supports AWS (eksctl), Azure, and GCP
-
----
+- 📄 Generates cloud-specific infrastructure templates
+- Creates provider-specific output in `/output` directory
+- Supports all major cloud providers
 
 ### `apply`
 ```bash
-infra-cli apply --config-file examples/aws-sample.yaml
+infra-cli apply --config-file path/to/config.yaml [--dry-run] [--auto-approve]
 ```
-- 🚀 Simulates or triggers provisioning (eksctl/gcloud/az)
-- Will use Terraform in future versions
+- 🚀 Provisions infrastructure using native cloud CLIs
+- `--dry-run`: Preview changes without applying
+- `--auto-approve`: Skip confirmation prompts
+
+### `delete` (Coming Soon)
+```bash
+infra-cli delete --config-file path/to/config.yaml [--dry-run] [--auto-approve]
+```
+- 🗑️ Removes provisioned infrastructure
+- Includes safety confirmations
+- Supports dry-run mode
 
 ---
 
-## 📦 Sample Config
+## 📦 Configuration Example
 
 ```yaml
 cloud: aws
@@ -109,46 +177,91 @@ identityProvider:
 
 ---
 
-## 📖 Docs
+## 🧪 Testing
 
-- [Phase 1: Why I’m Building This CLI](https://prathyushdommata.hashnode.dev/kubernetes-cli)
-- [Phase 2: Validated Config-Driven CLI Design](https://prathyushdommata.hashnode.dev/robust-kubernetes-cli)
+### Running Tests
+```bash
+# Run all tests
+pytest
+
+# Run specific test file
+pytest tests/test_validation.py
+
+# Run with verbose output
+pytest -v
+```
+
+### Test Coverage
+- ✅ Configuration validation
+- ✅ Template rendering
+- ✅ Infrastructure provisioning
+- ✅ Cloud provider integration
+
+### Manual Testing Steps
+1. Start with configuration validation
+2. Test template rendering
+3. Use dry-run mode for apply commands
+4. Test with actual cloud provider credentials
+
+---
+
+## 🔐 Cloud Provider Setup
+
+### AWS
+1. Install AWS CLI v2 and eksctl
+2. Configure AWS credentials (`aws configure`)
+3. Ensure proper IAM permissions for EKS
+
+### Azure
+1. Install Azure CLI
+2. Login to Azure (`az login`)
+3. Set subscription (`az account set --subscription <id>`)
+
+### GCP
+1. Install Google Cloud SDK
+2. Initialize SDK (`gcloud init`)
+3. Set project and region
+
+---
+
+## 🛠️ Development
+
+### Adding New Features
+1. Create feature branch
+2. Add tests in `tests/`
+3. Implement feature
+4. Update documentation
+5. Submit PR
+
+### Debug Mode
+```bash
+# Enable debug logging
+export DEBUG=1  # Linux/macOS
+$env:DEBUG=1    # Windows
+```
 
 ---
 
 ## 🧠 Roadmap
 
-- [ ] Real provisioning using `eksctl`, `az`, `gcloud`
-- [ ] Merge optional defaults from `configs/defaults/`
-- [ ] GitOps-style template sync using Flux
+- [x] Basic CLI structure and commands
+- [x] AWS (eksctl) integration
+- [ ] Azure AKS full integration
+- [ ] GCP GKE integration
 - [ ] Terraform backend support
+- [ ] GitOps integration with Flux
+- [ ] Interactive cluster configuration
+- [ ] Multi-cluster management
 
 ---
 
-## 🙌 Contributions
+## 🤝 Contributing
 
-We welcome PRs and ideas for improvement. Reach out if you're building a similar internal DevOps platform!
-
----
-
-## 🏃‍♂️ Quick Start
-
-```bash
-# Validate
-infra-cli validate --config-file examples/aws-sample.yaml
-
-# Preview config
-infra-cli load --config-file examples/aws-sample.yaml
-
-# Render template
-infra-cli render --config-file examples/aws-sample.yaml
-
-# Apply (Coming Soon)
-infra-cli apply --config-file examples/aws-sample.yaml
-```
+We welcome contributions! Please see our contributing guidelines for more details.
 
 ---
 
 ## 📬 License
 
+MIT License — happy building! 🚀
 MIT License — happy building 🚀

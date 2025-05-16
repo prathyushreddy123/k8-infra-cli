@@ -1,7 +1,7 @@
 import click
 import os
 import subprocess
-from infra_cli.utils.validation import validate_config_file
+from utils.validation import validate_config_file
 
 @click.command()
 @click.option('--config-file', '-f', required=True, type=click.Path(exists=True), help='Path to input YAML config')

@@ -3,8 +3,8 @@ from cli.create_request import create
 from cli.load_config import load
 from cli.render_templates import render
 from cli.apply_infra import apply
-from cli.validate_config import validate
-from infra_cli.utils.validation import validate_config_file
+from cli.validate_config import validate_config
+from utils.validation import validate_config_file
 
 @click.group()
 def cli():
@@ -15,7 +15,7 @@ cli.add_command(create)
 cli.add_command(load)
 cli.add_command(render)
 cli.add_command(apply)
-cli.add_command(validate)
+cli.add_command(validate_config)
 
 if __name__ == "__main__":
     cli()

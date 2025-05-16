@@ -4,7 +4,7 @@ kind: ClusterConfig
 metadata:
   name: {{ cluster.name }}
   region: {{ account.region }}
-  version: {{ cluster.version }}
+  version: "{{ cluster.version }}"
   tags:
     environment: {{ account.environment }}
     owner: {{ email.to }}
@@ -23,27 +23,7 @@ nodeGroups:
       {% for key, value in node.labels.items() %}
       {{ key }}: {{ value }}
       {% endfor %}
-    {% if node.taints %}
-    taints:
-      {% for taint in node.taints %}
-      - key: {{ taint.key }}
-        value: {{ taint.value }}
-        effect: {{ taint.effect }}
-      {% endfor %}
-    {% endif %}
-    {% if node.shutdownDelay.enabled %}
-    preBootstrapCommands:
-      - echo "Delaying shutdown for {{ node.shutdownDelay.delay }} seconds"
-    {% endif %}
 {% endfor %}
-
-{% if addons.ingressNginx.enabled %}
-addons:
-  - name: ingress-nginx
-    version: latest
-    attachPolicyARNs:
-      - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
-{% endif %}
 
 cloudWatch:
   clusterLogging:
@@ -53,46 +33,6 @@ cloudWatch:
       - authenticator
       - controllerManager
       - scheduler
-  retentionInDays: {{ addons.cloudwatchLogs.retentionInDays }}
 
-{% if addons.prometheus.enabled %}
-prometheus:
-  enabled: true
-{% endif %}
-
-{% if addons.grafana.enabled %}
-grafana:
-  enabled: true
-{% endif %}
-
-{% if addons.flux.enabled %}
-flux:
-  enabled: true
-{% endif %}
-
-{% if addons.certificateOperator.enabled %}
-certManager:
-  enabled: true
-{% endif %}
-
-{% if addons.cilium.enabled %}
-networking:
-  cni:
-    name: cilium
-{% endif %}
-
-kubeletConfiguration:
-  shutdownGracePeriod: {{ kubeletConfiguration.shutdownGracePeriod }}
-  shutdownGracePeriodCriticalPods: {{ kubeletConfiguration.shutdownGracePeriodCriticalPods }}
-
-nodeUpdates:
-  enabled: {{ nodeUpdates.enabled }}
-  schedule: "{{ nodeUpdates.schedule }}"
-  drainTimeout: "{{ nodeUpdates.drainTimeout }}"
-  partitionSize: {{ nodeUpdates.partitionSize }}
-
-{% if identityProvider.enabled %}
-identityProvider:
-  enabled: true
-  provider: "iam"  # Placeholder - customize later
-{% endif %}
+iam:
+  withOIDC: true

@@ -3,6 +3,8 @@ account:
   id: "891377122094"         # Replace with your AWS account ID
   region: "us-east-1"
   environment: "dev"
+email:
+  to: "admin@example.com"    # Replace with your email
 cluster:
   name: "test-eks-cluster"
   version: "1.29"
@@ -35,5 +37,15 @@ addons:
   cloudwatchLogs:
     enabled: true
     retentionInDays: 30
+  flux:
+    enabled: false
 identityProvider:
   enabled: false
+kubeletConfiguration:
+  shutdownGracePeriod: "30s"
+  shutdownGracePeriodCriticalPods: "10s"
+nodeUpdates:
+  enabled: true
+  schedule: "0 2 * * *"  # 2 AM every day
+  drainTimeout: "5m"
+  partitionSize: 1

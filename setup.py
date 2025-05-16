@@ -8,7 +8,11 @@ setup(
     install_requires=[
         "click",
         "pyyaml",
-        "jsonschema"
+        "jsonschema",
+        "jinja2",
+        "python-dotenv",
+        "boto3",
+        "requests"
     ],
     entry_points={
         'console_scripts': [
