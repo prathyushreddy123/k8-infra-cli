@@ -13,16 +13,28 @@ This CLI tool allows platform and DevOps teams to self-serve Kubernetes infrastr
   - Azure: Azure CLI (`az`)
   - GCP: Google Cloud SDK (`gcloud`)
 - Valid cloud provider credentials configured
+- Git installed
 
 ---
 
 ## ⚙️ Installation & Setup
 
+### Clone the Repository
+
+You can clone the repository using either HTTPS (recommended for beginners) or SSH:
+
+```bash
+# Using HTTPS (Recommended)
+git clone https://github.com/shravandeshpande1508/infra-cli.git
+
+# Using SSH (If you have SSH keys configured)
+git clone git@github.com:shravandeshpande1508/infra-cli.git
+```
+
 ### Windows (PowerShell)
 
 ```powershell
-# Clone the repository
-git clone <repository-url>
+# Navigate to the project directory
 cd infra-cli
 
 # Create and activate virtual environment
@@ -39,8 +51,7 @@ pip install -r requirements.txt
 ### Linux/macOS
 
 ```bash
-# Clone the repository
-git clone <repository-url>
+# Navigate to the project directory
 cd infra-cli
 
 # Create and activate virtual environment
@@ -61,6 +72,41 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 # GCP
 # Follow instructions at https://cloud.google.com/sdk/docs/install
 ```
+
+### Troubleshooting
+
+#### Git Clone Issues
+
+If you encounter SSH-related errors when cloning:
+
+1. **Use HTTPS Instead (Quickest Solution)**
+   ```bash
+   git clone https://github.com/shravandeshpande1508/infra-cli.git
+   ```
+
+2. **Set Up SSH Keys (For SSH Access)**
+   ```bash
+   # Generate SSH key
+   ssh-keygen -t ed25519 -C "your_email@example.com"
+   
+   # Start SSH agent
+   eval "$(ssh-agent -s)"  # Linux/macOS
+   # or
+   start-ssh-agent        # Windows
+   
+   # Add your SSH key
+   ssh-add ~/.ssh/id_ed25519
+   
+   # Copy the public key and add it to your GitHub account
+   # Linux/macOS:
+   cat ~/.ssh/id_ed25519.pub
+   # Windows:
+   type %USERPROFILE%\.ssh\id_ed25519.pub
+   ```
+   Then add the key to GitHub:
+   1. Go to GitHub → Settings → SSH and GPG keys
+   2. Click "New SSH key"
+   3. Paste your public key and save
 
 ---
 
